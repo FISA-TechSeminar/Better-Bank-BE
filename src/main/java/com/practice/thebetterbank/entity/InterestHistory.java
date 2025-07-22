@@ -14,11 +14,14 @@ import java.time.LocalDate;
 public class InterestHistory {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "interest_history_seq")
+    @SequenceGenerator(name = "interest_history_seq", sequenceName = "interest_history_seq", allocationSize = 1)
     private Long id;
 
+    @Column(name = "ih_date")
     private LocalDate ihDate;
 
+    @Column(name = "ih_amount")
     private Double ihAmount;
 
     @ManyToOne(fetch = FetchType.LAZY)

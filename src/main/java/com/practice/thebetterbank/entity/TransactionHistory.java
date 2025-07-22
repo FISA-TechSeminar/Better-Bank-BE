@@ -14,10 +14,10 @@ import java.time.LocalDate;
 public class TransactionHistory {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "transaction_history_seq")
+    @SequenceGenerator(name = "transaction_history_seq", sequenceName = "transaction_history_seq", allocationSize = 1)
     private Long id;
 
-    // FK to Account
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id")
     private Account account;
@@ -37,7 +37,8 @@ public class TransactionHistory {
     private String transactionType;
 
     @Builder
-    public TransactionHistory(Long id, Account account, Integer amount, String transactionName, LocalDate transactionDate, String targetAccountNumber, String transactionType) {
+    public TransactionHistory(Long id, Account account, Integer amount, String transactionName,
+                              LocalDate transactionDate, String targetAccountNumber, String transactionType) {
         this.id = id;
         this.account = account;
         this.amount = amount;
