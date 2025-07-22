@@ -12,7 +12,6 @@ import java.util.List;
 @Table(name = "User")
 @Getter
 @NoArgsConstructor
-@Builder
 public class User {
 
     @Id
@@ -23,4 +22,10 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Account> accounts = new ArrayList<>();
+
+    @Builder
+    public User(Long id, String username) {
+        this.id = id;
+        this.username = username;
+    }
 }

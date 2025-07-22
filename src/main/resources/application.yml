@@ -3,7 +3,7 @@ server:
 
 spring:
   application:
-    name=wooribank
+    name=thebetterbank
   datasource:
     url: jdbc:oracle:thin:@localhost:1521:XE
     username: your_username
@@ -14,7 +14,6 @@ spring:
 
   main:
     allow-bean-definition-overriding: true
-
 
   jackson:
     time-zone: Asia/Seoul # Jackson? ???? ?? ??? ??
@@ -39,6 +38,3 @@ spring:
       port: 6379
       password: 1234
       timeout: 10000
-
-jwt:
-  secret: c3ByaW5nLWJvb3Qtc2VjdXJpdHktand0LXR1dG9yaWFsLWppd29vbi1zcHJpbmctYm9vdC1zZWN1cml0eS1qd3QtdHV0b3JpYWwK

@@ -1,6 +1,7 @@
 package com.practice.thebetterbank.entity;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -37,4 +38,16 @@ public class Account {
 
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL)
     private List<TransactionHistory> transactionHistories = new ArrayList<>();
+
+    @Builder
+    public Account(Long id, User user, String name, Long balance, Double interestRate, String accountNumber, List<InterestHistory> interestHistories, List<TransactionHistory> transactionHistories) {
+        this.id = id;
+        this.user = user;
+        this.name = name;
+        this.balance = balance;
+        this.interestRate = interestRate;
+        this.accountNumber = accountNumber;
+        this.interestHistories = interestHistories;
+        this.transactionHistories = transactionHistories;
+    }
 }
