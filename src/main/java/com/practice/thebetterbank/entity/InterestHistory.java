@@ -11,6 +11,7 @@ import java.time.LocalDate;
 @Table(name = "Interest_History")
 @Getter
 @NoArgsConstructor
+// 이자 지금 받기 내역
 public class InterestHistory {
 
     @Id

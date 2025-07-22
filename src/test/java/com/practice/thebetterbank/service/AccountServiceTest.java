@@ -18,9 +18,6 @@ public class AccountServiceTest {
     @Autowired
     private AccountService accountService;
 
-    @Autowired
-    private MemberRepository memberRepository;
-
     private Member member1;
     private Member member2;
     private Member member3;
@@ -28,23 +25,26 @@ public class AccountServiceTest {
 
     @BeforeEach
     void setup() {
-        memberRepository.deleteAll();
 
-        member1 = memberRepository.save(Member.builder()
+        member1 = Member.builder()
+                .id(1L)
                 .username("이조은")
-                .build());
+                .build();
 
-        member2 = memberRepository.save(Member.builder()
+        member2 = Member.builder()
+                .id(2L)
                 .username("서민지")
-                .build());
+                .build();
 
-        member3 = memberRepository.save(Member.builder()
+        member3 =Member.builder()
+                .id(3L)
                 .username("이영주")
-                .build());
+                .build();
 
-        member4 = memberRepository.save(Member.builder()
+        member4 = Member.builder()
+                .id(4L)
                 .username("홍윤기")
-                .build());
+                .build();
     }
 
     @Test
