@@ -1,3 +1,4 @@
+// Account.java
 package com.practice.thebetterbank.entity;
 
 import jakarta.persistence.*;
@@ -15,10 +16,10 @@ import java.util.List;
 public class Account {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "account_seq")
+    @SequenceGenerator(name = "account_seq", sequenceName = "account_seq", allocationSize = 1)
     private Long id;
 
-    // FK to User
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
@@ -40,14 +41,15 @@ public class Account {
     private List<TransactionHistory> transactionHistories = new ArrayList<>();
 
     @Builder
-    public Account(Long id, Member member, String name, Long balance, Double interestRate, String accountNumber, List<InterestHistory> interestHistories, List<TransactionHistory> transactionHistories) {
+    public Account(Long id, Member member, String name, Long balance, Double interestRate, String accountNumber,
+                   List<InterestHistory> interestHistories, List<TransactionHistory> transactionHistories) {
         this.id = id;
         this.member = member;
         this.name = name;
         this.balance = balance;
         this.interestRate = interestRate;
         this.accountNumber = accountNumber;
-        this.interestHistories = interestHistories;
-        this.transactionHistories = transactionHistories;
+        this.interestHistories = interestHistories != null ? interestHistories : new ArrayList<>();
+        this.transactionHistories = transactionHistories != null ? transactionHistories : new ArrayList<>();
     }
 }
