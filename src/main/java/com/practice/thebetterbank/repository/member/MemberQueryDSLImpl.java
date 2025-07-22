@@ -1,4 +1,4 @@
-package com.practice.thebetterbank.repository.user;
+package com.practice.thebetterbank.repository.member;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 @Slf4j
 @Repository
 @RequiredArgsConstructor
-public class UserQueryDSLImpl implements UserQueryDSL {
+public class MemberQueryDSLImpl implements MemberQueryDSL {
 
     private final JPAQueryFactory query;
 

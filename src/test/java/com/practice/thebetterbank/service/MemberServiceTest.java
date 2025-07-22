@@ -1,8 +1,8 @@
 package com.practice.thebetterbank.service;
 
 
-import com.practice.thebetterbank.entity.User;
-import com.practice.thebetterbank.service.user.UserService;
+import com.practice.thebetterbank.entity.Member;
+import com.practice.thebetterbank.service.user.MemberService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,14 +10,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
 @Slf4j
-public class UserServiceTest {
+public class MemberServiceTest {
 
     @Autowired
-    private UserService userService;
+    private MemberService memberService;
 
     @Test
     public void saveUserTest() {
-        User user = new User();
+        Member member = new Member();
     }
 
 }

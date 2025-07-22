@@ -20,8 +20,8 @@ public class Account {
 
     // FK to User
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @JoinColumn(name = "member_id")
+    private Member member;
 
     private String name;
 
@@ -40,9 +40,9 @@ public class Account {
     private List<TransactionHistory> transactionHistories = new ArrayList<>();
 
     @Builder
-    public Account(Long id, User user, String name, Long balance, Double interestRate, String accountNumber, List<InterestHistory> interestHistories, List<TransactionHistory> transactionHistories) {
+    public Account(Long id, Member member, String name, Long balance, Double interestRate, String accountNumber, List<InterestHistory> interestHistories, List<TransactionHistory> transactionHistories) {
         this.id = id;
-        this.user = user;
+        this.member = member;
         this.name = name;
         this.balance = balance;
         this.interestRate = interestRate;

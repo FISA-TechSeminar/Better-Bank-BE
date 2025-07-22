@@ -26,15 +26,15 @@ public class InterestHistory {
     private Account account;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @JoinColumn(name = "member_id")
+    private Member member;
 
     @Builder
-    public InterestHistory(Long id, LocalDate ihDate, Double ihAmount, Account account, User user) {
+    public InterestHistory(Long id, LocalDate ihDate, Double ihAmount, Account account, Member member) {
         this.id = id;
         this.ihDate = ihDate;
         this.ihAmount = ihAmount;
         this.account = account;
-        this.user = user;
+        this.member = member;
     }
 }

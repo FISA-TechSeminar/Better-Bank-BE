@@ -12,7 +12,7 @@ import java.util.List;
 @Table(name = "User")
 @Getter
 @NoArgsConstructor
-public class User {
+public class Member {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,11 +20,11 @@ public class User {
 
     private String username;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<Account> accounts = new ArrayList<>();
 
     @Builder
-    public User(Long id, String username) {
+    public Member(Long id, String username) {
         this.id = id;
         this.username = username;
     }
