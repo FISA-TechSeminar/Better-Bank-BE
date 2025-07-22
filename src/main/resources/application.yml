@@ -1,0 +1,44 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name=wooribank
+  datasource:
+    url: jdbc:oracle:thin:@localhost:1521:XE
+    username: your_username
+    password: your_password
+    driver-class-name: oracle.jdbc.OracleDriver
+    hikari:
+      maximum-pool-size: 10
+
+  main:
+    allow-bean-definition-overriding: true
+
+
+  jackson:
+    time-zone: Asia/Seoul # Jackson? ???? ?? ??? ??
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+    # jpa format
+    properties:
+      hibernate:
+        format_sql: true
+    show-sql: true
+
+  # log
+  output:
+    ansi:
+      enabled: always
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: 1234
+      timeout: 10000
+
+jwt:
+  secret: c3ByaW5nLWJvb3Qtc2VjdXJpdHktand0LXR1dG9yaWFsLWppd29vbi1zcHJpbmctYm9vdC1zZWN1cml0eS1qd3QtdHV0b3JpYWwK
