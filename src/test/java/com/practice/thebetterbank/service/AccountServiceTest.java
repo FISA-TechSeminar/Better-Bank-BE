@@ -5,6 +5,7 @@ import com.practice.thebetterbank.entity.Member;
 import com.practice.thebetterbank.service.account.AccountService;
 import com.practice.thebetterbank.repository.member.MemberRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,29 +21,46 @@ public class AccountServiceTest {
     @Autowired
     private MemberRepository memberRepository;
 
+    private Member member1;
+    private Member member2;
+    private Member member3;
+    private Member member4;
+
+    @BeforeEach
+    void setup() {
+        memberRepository.deleteAll();
+
+        member1 = memberRepository.save(Member.builder()
+                .username("이조은")
+                .build());
+
+        member2 = memberRepository.save(Member.builder()
+                .username("서민지")
+                .build());
+
+        member3 = memberRepository.save(Member.builder()
+                .username("이영주")
+                .build());
+
+        member4 = memberRepository.save(Member.builder()
+                .username("홍윤기")
+                .build());
+    }
+
     @Test
     public void saveDummyAccounts() {
-        Member member1 = memberRepository.findById(1L).orElseThrow(() -> new RuntimeException("User 1 not found"));
-        Member member2 = memberRepository.findById(2L).orElseThrow(() -> new RuntimeException("User 2 not found"));
-        Member member3 = memberRepository.findById(3L).orElseThrow(() -> new RuntimeException("User 3 not found"));
-        Member member4 = memberRepository.findById(4L).orElseThrow(() -> new RuntimeException("User 4 not found"));
-
-        // User 1
         accountService.save(Account.builder().member(member1).name("저축 통장").balance(5000000L).interestRate(1.2).accountNumber("110-1234-5678").build());
         accountService.save(Account.builder().member(member1).name("생활비 통장").balance(1200000L).interestRate(0.5).accountNumber("110-2345-6789").build());
         accountService.save(Account.builder().member(member1).name("월급 통장").balance(30000000L).interestRate(3.0).accountNumber("110-3456-7890").build());
 
-        // User 2
         accountService.save(Account.builder().member(member2).name("월급 통장").balance(800000L).interestRate(1.0).accountNumber("220-1234-5678").build());
         accountService.save(Account.builder().member(member2).name("생활비 통장").balance(1500000L).interestRate(0.6).accountNumber("220-2345-6789").build());
         accountService.save(Account.builder().member(member2).name("비상금 통장").balance(20000000L).interestRate(2.8).accountNumber("220-3456-7890").build());
 
-        // User 3
         accountService.save(Account.builder().member(member3).name("투자 통장").balance(3000000L).interestRate(1.1).accountNumber("330-1234-5678").build());
         accountService.save(Account.builder().member(member3).name("청약 통장").balance(900000L).interestRate(0.4).accountNumber("330-2345-6789").build());
         accountService.save(Account.builder().member(member3).name("용돈 통장").balance(10000000L).interestRate(2.5).accountNumber("330-3456-7890").build());
 
-        // User 4
         accountService.save(Account.builder().member(member4).name("자동이체 통장").balance(4000000L).interestRate(1.3).accountNumber("440-1234-5678").build());
         accountService.save(Account.builder().member(member4).name("여행 통장").balance(1000000L).interestRate(0.45).accountNumber("440-2345-6789").build());
         accountService.save(Account.builder().member(member4).name("생활비 통장").balance(25000000L).interestRate(2.9).accountNumber("440-3456-7890").build());
