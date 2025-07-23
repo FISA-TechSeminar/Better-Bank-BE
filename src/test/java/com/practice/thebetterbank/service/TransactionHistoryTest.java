@@ -26,7 +26,9 @@ public class TransactionHistoryTest {
     private AccountRepository accountRepository;
 
     private final Random random = new Random();
+
     private static final List<String> NAMES = List.of("최홍석", "홍혜원", "황지환", "김혜경", "이제현", "김동민", "이정이");
+
     private static final List<String> SHOPS = List.of("엽기떡볶이", "이디야커피", "GS25", "스타벅스", "배달의민족", "맘스터치", "던킨도너츠");
 
     private String getRandomName() {
