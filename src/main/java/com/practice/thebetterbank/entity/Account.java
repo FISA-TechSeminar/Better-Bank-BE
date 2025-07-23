@@ -1,6 +1,7 @@
 // Account.java
 package com.practice.thebetterbank.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,7 +23,11 @@ public class Account {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
+<<<<<<< HEAD
     @Json
+=======
+    @JsonBackReference
+>>>>>>> main
     private Member member;
 
     private String name;
