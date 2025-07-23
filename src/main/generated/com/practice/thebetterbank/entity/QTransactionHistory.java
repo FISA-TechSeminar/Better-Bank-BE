@@ -24,7 +24,7 @@ public class QTransactionHistory extends EntityPathBase<TransactionHistory> {
 
     public final QAccount account;
 
-    public final NumberPath<Integer> amount = createNumber("amount", Integer.class);
+    public final NumberPath<Long> amount = createNumber("amount", Long.class);
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 

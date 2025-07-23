@@ -23,7 +23,7 @@ public class TransactionHistory {
     @JoinColumn(name = "account_id")
     private Account account;
 
-    private Integer amount;
+    private Long amount;
 
     @Column(name = "transaction_name")
     private String transactionName;
@@ -39,7 +39,7 @@ public class TransactionHistory {
     private TransactionType transactionType;
 
     @Builder
-    public TransactionHistory(Long id, Account account, Integer amount, String transactionName,
+    public TransactionHistory(Long id, Account account, Long amount, String transactionName,
                               LocalDate transactionDate, String targetAccountNumber, TransactionType transactionType) {
         this.id = id;
         this.account = account;

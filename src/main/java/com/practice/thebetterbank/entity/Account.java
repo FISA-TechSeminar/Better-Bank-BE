@@ -54,4 +54,24 @@ public class Account {
         this.interestHistories = interestHistories != null ? interestHistories : new ArrayList<>();
         this.transactionHistories = transactionHistories != null ? transactionHistories : new ArrayList<>();
     }
+
+    // 잔액 증가
+    public void increaseBalance(Long amount) {
+        if (amount == null || amount <= 0) {
+            throw new IllegalArgumentException("증가할 금액은 0보다 커야 합니다.");
+        }
+        this.balance += amount;
+    }
+
+    // 잔액 감소
+    public void decreaseBalance(Long amount) {
+        if (amount == null || amount <= 0) {
+            throw new IllegalArgumentException("차감할 금액은 0보다 커야 합니다.");
+        }
+        if (this.balance < amount) {
+            throw new IllegalArgumentException("잔액이 부족합니다.");
+        }
+        this.balance -= amount;
+    }
+
 }
