@@ -17,7 +17,13 @@ public class MemberServiceTest {
 
     @Test
     public void saveUserTest() {
-        Member member = new Member();
+        Member[] users = new Member[] { Member.builder().username("이조은").build(),
+                Member.builder().username("서민지").build(),
+                Member.builder().username("이영주").build(),
+                Member.builder().username("홍윤기").build()};
+        for(Member user : users) {
+            memberService.save(user);
+        }
     }
 
 }

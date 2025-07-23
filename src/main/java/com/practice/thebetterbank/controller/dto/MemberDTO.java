@@ -10,5 +10,4 @@ import lombok.Data;
 public class MemberDTO {
     Long id;
     String memberName;
-    String sessionId;
 }

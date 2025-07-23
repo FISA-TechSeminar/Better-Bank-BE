@@ -1,5 +1,6 @@
 package com.practice.thebetterbank.entity;
 
+import com.practice.thebetterbank.entity.type.TransactionType;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -33,12 +34,13 @@ public class TransactionHistory {
     @Column(name = "target_account_number")
     private String targetAccountNumber;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "transaction_type")
-    private String transactionType;
+    private TransactionType transactionType;
 
     @Builder
     public TransactionHistory(Long id, Account account, Integer amount, String transactionName,
-                              LocalDate transactionDate, String targetAccountNumber, String transactionType) {
+                              LocalDate transactionDate, String targetAccountNumber, TransactionType transactionType) {
         this.id = id;
         this.account = account;
         this.amount = amount;

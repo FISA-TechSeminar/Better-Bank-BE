@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/member")
 @RequiredArgsConstructor
 public class MemberController {
 
@@ -29,7 +29,6 @@ public class MemberController {
         MemberDTO memberDTO = MemberDTO.builder()
             .id(user.getId())
             .memberName(user.getUsername())
-            .sessionId(session.getAttribute("sessionId").toString())
             .build();
 
         return ResultDTO.res(HttpStatus.OK, "회원 정보를 불러왔습니다!", memberDTO);
