@@ -17,7 +17,7 @@ import java.util.Random;
 
 @SpringBootTest
 @Slf4j
-public class TransactionHistoryTest {
+public class TransactionHistoryQueryDSLTest {
 
     @Autowired
     private TransactionHistoryRepository transactionHistoryRepository;

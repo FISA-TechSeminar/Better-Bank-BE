@@ -22,6 +22,7 @@ public class Account {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
+    @Json
     private Member member;
 
     private String name;

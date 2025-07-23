@@ -2,6 +2,11 @@ package com.practice.thebetterbank.repository.transactionhistory;
 
 import com.practice.thebetterbank.entity.TransactionHistory;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface TransactionHistoryRepository  extends JpaRepository<TransactionHistory, Long> {
+import java.util.List;
+
+@Repository
+public interface TransactionHistoryRepository extends JpaRepository<TransactionHistory, Long> {
+    List<TransactionHistory> findAllByAccountId(Long accountId);
 }
