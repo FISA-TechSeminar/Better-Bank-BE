@@ -36,6 +36,7 @@ public class TransactionHistoryTest {
     private String getRandomShop() {
         return SHOPS.get(random.nextInt(SHOPS.size()));
     }
+
     @Test
     public void transactionHistoryTest() {
 
