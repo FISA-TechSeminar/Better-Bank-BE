@@ -1,5 +1,6 @@
 package com.practice.thebetterbank.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,6 +23,7 @@ public class Member {
     private String username;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    @JsonManagedReference
     private List<Account> accounts = new ArrayList<>();
 
     @Builder
