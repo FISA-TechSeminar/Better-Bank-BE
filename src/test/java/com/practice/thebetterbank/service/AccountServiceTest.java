@@ -9,7 +9,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.List;
+import java.util.Optional;
+
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 @SpringBootTest
 @Slf4j
@@ -67,4 +72,47 @@ public class AccountServiceTest {
 
         log.info("✅ 기존 유저 4명에게 계좌 3개씩 총 12건 저장 완료");
     }
+
+    @Test
+    public void testGetAccountsByUserId() {
+        // given - 더미 데이터 저장 (member1, 계좌 3개)
+        saveDummyAccounts();
+
+        Long userId = member1.getId();
+
+        // when
+        List<Account> accounts = accountService.getAccountsByMemberId(userId);
+
+        // then
+        assertThat(accounts).isNotNull();
+        assertThat(accounts.size()).isEqualTo(3);
+        assertThat(accounts).extracting("name")
+                .containsExactlyInAnyOrder("저축 통장", "생활비 통장", "월급 통장");
+        assertThat(accounts).allMatch(account -> account.getAccountNumber() != null);
+    }
+
+    @Test
+    public void testGetAccountById() {
+        // given: member1 계좌 하나 저장 및 id 확보
+        Account savedAccount = accountService.save(Account.builder()
+                .member(member1)
+                .name("테스트 계좌")
+                .balance(1000000L)
+                .interestRate(1.5)
+                .accountNumber("999-1111-2222")
+                .build());
+
+        Long accountId = savedAccount.getId();
+
+        // when
+        Optional<Account> found = accountService.getAccountById(accountId);
+
+        // then
+        assertThat(found).isPresent();
+        assertThat(found.get().getName()).isEqualTo("테스트 계좌");
+        assertThat(found.get().getAccountNumber()).isEqualTo("999-1111-2222");
+        assertThat(found.get().getBalance()).isEqualTo(1000000L);
+    }
+
+
 }
