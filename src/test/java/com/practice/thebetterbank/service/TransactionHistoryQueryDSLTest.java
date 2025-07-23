@@ -43,7 +43,7 @@ public class TransactionHistoryQueryDSLTest {
     public void transactionHistoryTest() {
 
         for (long accountId = 1; accountId <= 12; accountId++) {
-            int count = (accountId <= 8) ? 10 : 1000;
+            int count = (accountId <= 8) ? 10 : 10000;
             Account account = accountRepository.findById(accountId).orElseThrow();
 
             List<TransactionHistory> histories = new ArrayList<>();
