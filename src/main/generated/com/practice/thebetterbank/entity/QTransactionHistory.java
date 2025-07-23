@@ -34,7 +34,7 @@ public class QTransactionHistory extends EntityPathBase<TransactionHistory> {
 
     public final StringPath transactionName = createString("transactionName");
 
-    public final StringPath transactionType = createString("transactionType");
+    public final EnumPath<com.practice.thebetterbank.entity.type.TransactionType> transactionType = createEnum("transactionType", com.practice.thebetterbank.entity.type.TransactionType.class);
 
     public QTransactionHistory(String variable) {
         this(TransactionHistory.class, forVariable(variable), INITS);
