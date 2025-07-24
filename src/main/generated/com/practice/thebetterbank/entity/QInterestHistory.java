@@ -30,8 +30,6 @@ public class QInterestHistory extends EntityPathBase<InterestHistory> {
 
     public final DatePath<java.time.LocalDate> ihDate = createDate("ihDate", java.time.LocalDate.class);
 
-    public final QMember member;
-
     public QInterestHistory(String variable) {
         this(InterestHistory.class, forVariable(variable), INITS);
     }
@@ -51,7 +49,6 @@ public class QInterestHistory extends EntityPathBase<InterestHistory> {
     public QInterestHistory(Class<? extends InterestHistory> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
         this.account = inits.isInitialized("account") ? new QAccount(forProperty("account"), inits.get("account")) : null;
-        this.member = inits.isInitialized("member") ? new QMember(forProperty("member")) : null;
     }
 
 }

@@ -1,5 +1,6 @@
 package com.practice.thebetterbank.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.practice.thebetterbank.entity.type.TransactionType;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -21,6 +22,7 @@ public class TransactionHistory {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id")
+    @JsonBackReference
     private Account account;
 
     private Long amount;

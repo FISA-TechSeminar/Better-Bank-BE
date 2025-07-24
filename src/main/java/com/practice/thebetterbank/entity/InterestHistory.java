@@ -1,5 +1,6 @@
 package com.practice.thebetterbank.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -27,18 +28,14 @@ public class InterestHistory {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id")
+    @JsonBackReference
     private Account account;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
-    private Member member;
-
     @Builder
-    public InterestHistory(Long id, LocalDate ihDate, Double ihAmount, Account account, Member member) {
+    public InterestHistory(Long id, LocalDate ihDate, Double ihAmount, Account account) {
         this.id = id;
         this.ihDate = ihDate;
         this.ihAmount = ihAmount;
         this.account = account;
-        this.member = member;
     }
 }
