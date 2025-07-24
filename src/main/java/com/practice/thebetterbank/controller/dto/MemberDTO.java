@@ -7,8 +7,7 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 @Builder
-public class UserDTO {
+public class MemberDTO {
     Long id;
-    String userName;
-    String sessionId;
+    String memberName;
 }

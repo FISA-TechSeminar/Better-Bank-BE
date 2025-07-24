@@ -1,5 +1,7 @@
+// Account.java
 package com.practice.thebetterbank.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,13 +17,14 @@ import java.util.List;
 public class Account {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "account_seq")
+    @SequenceGenerator(name = "account_seq", sequenceName = "account_seq", allocationSize = 1)
     private Long id;
 
-    // FK to User
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @JoinColumn(name = "member_id")
+    @JsonBackReference
+    private Member member;
 
     private String name;
 
@@ -40,14 +43,35 @@ public class Account {
     private List<TransactionHistory> transactionHistories = new ArrayList<>();
 
     @Builder
-    public Account(Long id, User user, String name, Long balance, Double interestRate, String accountNumber, List<InterestHistory> interestHistories, List<TransactionHistory> transactionHistories) {
+    public Account(Long id, Member member, String name, Long balance, Double interestRate, String accountNumber,
+                   List<InterestHistory> interestHistories, List<TransactionHistory> transactionHistories) {
         this.id = id;
-        this.user = user;
+        this.member = member;
         this.name = name;
         this.balance = balance;
         this.interestRate = interestRate;
         this.accountNumber = accountNumber;
-        this.interestHistories = interestHistories;
-        this.transactionHistories = transactionHistories;
+        this.interestHistories = interestHistories != null ? interestHistories : new ArrayList<>();
+        this.transactionHistories = transactionHistories != null ? transactionHistories : new ArrayList<>();
     }
+
+    // 잔액 증가
+    public void increaseBalance(Long amount) {
+        if (amount == null || amount <= 0) {
+            throw new IllegalArgumentException("증가할 금액은 0보다 커야 합니다.");
+        }
+        this.balance += amount;
+    }
+
+    // 잔액 감소
+    public void decreaseBalance(Long amount) {
+        if (amount == null || amount <= 0) {
+            throw new IllegalArgumentException("차감할 금액은 0보다 커야 합니다.");
+        }
+        if (this.balance < amount) {
+            throw new IllegalArgumentException("잔액이 부족합니다.");
+        }
+        this.balance -= amount;
+    }
+
 }

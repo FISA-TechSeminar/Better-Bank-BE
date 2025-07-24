@@ -1,5 +1,7 @@
 package com.practice.thebetterbank.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.practice.thebetterbank.entity.type.TransactionType;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,15 +16,16 @@ import java.time.LocalDate;
 public class TransactionHistory {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "transaction_history_seq")
+    @SequenceGenerator(name = "transaction_history_seq", sequenceName = "transaction_history_seq", allocationSize = 1)
     private Long id;
 
-    // FK to Account
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id")
+    @JsonBackReference
     private Account account;
 
-    private Integer amount;
+    private Long amount;
 
     @Column(name = "transaction_name")
     private String transactionName;
@@ -33,11 +36,13 @@ public class TransactionHistory {
     @Column(name = "target_account_number")
     private String targetAccountNumber;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "transaction_type")
-    private String transactionType;
+    private TransactionType transactionType;
 
     @Builder
-    public TransactionHistory(Long id, Account account, Integer amount, String transactionName, LocalDate transactionDate, String targetAccountNumber, String transactionType) {
+    public TransactionHistory(Long id, Account account, Long amount, String transactionName,
+                              LocalDate transactionDate, String targetAccountNumber, TransactionType transactionType) {
         this.id = id;
         this.account = account;
         this.amount = amount;

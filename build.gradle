@@ -76,3 +76,8 @@ compileJava {
 clean {
     delete file(querydslDir)
 }
+
+
+
+
+
