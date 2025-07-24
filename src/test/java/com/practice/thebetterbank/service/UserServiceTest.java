@@ -17,7 +17,14 @@ public class UserServiceTest {
 
     @Test
     public void saveUserTest() {
-        User user = new User();
+        User[] users = new User[] { User.builder().id(1L).username("이조은").build(),
+        User.builder().id(2L).username("서민지").build(),
+        User.builder().id(3L).username("이영주").build(),
+        User.builder().id(4L).username("홍윤기").build()};
+        for(User user : users) {
+            userService.save(user);
+        }
+
     }
 
 }
