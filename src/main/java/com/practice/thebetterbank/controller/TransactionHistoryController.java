@@ -2,7 +2,6 @@ package com.practice.thebetterbank.controller;
 
 import com.practice.thebetterbank.controller.dto.ResultDTO;
 import com.practice.thebetterbank.entity.TransactionHistory;
-import com.practice.thebetterbank.repository.transactionhistory.TransactionHistoryRepository;
 import com.practice.thebetterbank.service.transactionhistory.TransactionHistoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
