@@ -14,6 +14,7 @@ import java.util.Optional;
 public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
+
     @Override
     public Optional<Member> getUserById(Long id) {
         return Optional.ofNullable(memberRepository.getUserById(id));

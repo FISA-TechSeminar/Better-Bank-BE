@@ -49,7 +49,7 @@ public class TransactionHistoryQueryDSLTest {
             List<TransactionHistory> histories = new ArrayList<>();
 
             for (int i = 0; i < count; i++) {
-                int amount = random.nextInt(1_000_000 - 10 + 1) + 10;
+                Long amount = (long) (random.nextInt(1_000_000 - 10 + 1) + 10);
                 TransactionType type = random.nextBoolean() ? TransactionType.DEPOSIT : TransactionType.TRANSFER;
                 LocalDate date = LocalDate.now().minusDays(random.nextInt(90)); // 최근 3개월 랜덤
                 String targetAccount = "10001234" + String.format("%04d", random.nextInt(10000));

@@ -16,7 +16,7 @@ public class UserServiceTest {
     private MemberService memberService;
 
     @Test
-    public void saveUserTest() {
+    public void saveMemberTest() {
         Member[] members = new Member[] { Member.builder().id(1L).username("이조은").build(),
         Member.builder().id(2L).username("서민지").build(),
         Member.builder().id(3L).username("이영주").build(),
