@@ -33,4 +33,5 @@ public class AccountServiceImpl implements AccountService {
     public List<Account> getAccountsByMemberId(Long memberId) {
         return accountRepository.findByMemberId(memberId);
     }
+
 }

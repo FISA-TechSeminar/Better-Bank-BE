@@ -9,8 +9,9 @@ import java.time.LocalDate;
 @Data
 @AllArgsConstructor
 @Builder
-public class InterestDTO {
+public class ReceiveInterestDTO {
     private Long accountId;
-    private LocalDate lastInterestDate;
     private Long interestAmount;
+    private Long newBalance;
+    private LocalDate receivedDate;
 }

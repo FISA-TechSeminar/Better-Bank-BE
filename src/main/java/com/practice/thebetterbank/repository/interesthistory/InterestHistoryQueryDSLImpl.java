@@ -11,6 +11,7 @@ public class InterestHistoryQueryDSLImpl implements InterestHistoryQueryDSL {
 
     private final JPAQueryFactory queryFactory;
 
+    // 오늘 이자 지금 받기를 받은적 있는지
     @Override
     public boolean existsTodayInterest(Long accountId, LocalDate today) {
         QInterestHistory ih = QInterestHistory.interestHistory;
@@ -27,6 +28,7 @@ public class InterestHistoryQueryDSLImpl implements InterestHistoryQueryDSL {
         return fetchOne != null;
     }
 
+    // 마지막 이자 지금 받기를 받은 날짜
     @Override
     public LocalDate findLastInterestDate(Long accountId) {
         QInterestHistory ih = QInterestHistory.interestHistory;
@@ -40,6 +42,7 @@ public class InterestHistoryQueryDSLImpl implements InterestHistoryQueryDSL {
                 .fetchOne();
     }
 
+    // 오늘 모든 트랜잭션 값의 합
     @Override
     public Long findBalanceExcludingTodayTransactions(Long accountId, LocalDate today) {
         QTransactionHistory th = QTransactionHistory.transactionHistory;

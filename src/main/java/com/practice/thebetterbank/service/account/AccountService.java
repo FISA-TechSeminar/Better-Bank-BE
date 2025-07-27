@@ -12,4 +12,5 @@ public interface AccountService {
 
     // 유저 ID로 계좌 목록 조회 추가
     List<Account> getAccountsByMemberId(Long memberId);
+
 }

@@ -2,24 +2,35 @@ package com.practice.thebetterbank.controller;
 
 import com.practice.thebetterbank.controller.dto.AccountDTO;
 import com.practice.thebetterbank.controller.dto.InterestDTO;
+import com.practice.thebetterbank.controller.dto.ReceiveInterestDTO;
 import com.practice.thebetterbank.controller.dto.ResultDTO;
 import com.practice.thebetterbank.entity.Account;
+import com.practice.thebetterbank.repository.transactionhistory.TransactionHistoryRepository;
 import com.practice.thebetterbank.service.account.AccountService;
+import com.practice.thebetterbank.service.interesthistory.InterestHistoryService;
+import com.practice.thebetterbank.service.transactionhistory.TransactionHistoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Optional;
+
+import static com.practice.thebetterbank.entity.QTransactionHistory.transactionHistory;
 
 @RestController
 @RequiredArgsConstructor
 public class AccountController {
 
     private final AccountService accountService;
+
+    private final InterestHistoryService interestHistoryService;
+
+    private final TransactionHistoryService transactionHistoryService;
 
     // 유저별 계좌 목록 조회
     @GetMapping("/members/{memberId}/accounts")
@@ -40,6 +51,72 @@ public class AccountController {
                 .orElse(ResultDTO.res(HttpStatus.NOT_FOUND, "계좌를 찾을 수 없습니다."));
     }
 
-//    @GetMapping("/accounts/{accountId}/interest")
-//    public ResultDTO<InterestDTO>
+    @GetMapping("/accounts/{accountId}/interest")
+    public ResultDTO<InterestDTO> selectInterestByAccountId(@PathVariable Long accountId) {
+        LocalDate today = LocalDate.now();
+        boolean todayInterest = interestHistoryService.getExistsTodayInterest(accountId,today);
+
+        if (todayInterest) {
+            return  ResultDTO.res(HttpStatus.BAD_REQUEST,"오늘은 이미 수령하셨습니다");
+        }
+        LocalDate gotInterestDate = interestHistoryService.getLastInterestDate(accountId);
+        int daysBetween = (int) ChronoUnit.DAYS.between(gotInterestDate, today);
+        Optional<Account> foundAccount= accountService.getAccountById(accountId);
+        Long todayTransactions = interestHistoryService.getBalanceExcludingTodayTransactions(accountId,today);
+        if (foundAccount.isPresent()) {
+            double interest = daysBetween
+                                *foundAccount.get().getInterestRate()
+                                *(foundAccount.get().getBalance()-todayTransactions);
+
+            InterestDTO interestDTO = InterestDTO.builder().accountId(accountId).lastInterestDate(gotInterestDate).interestAmount((long) interest).build();
+            return ResultDTO.res(HttpStatus.ACCEPTED,"이자 조회 성공",interestDTO);
+        }
+        return ResultDTO.res(HttpStatus.BAD_REQUEST,"이자 조회 실패");
+
+
+    }
+
+
+    @GetMapping("/accounts/{accountId}/receiveinterest")
+    public ResultDTO<ReceiveInterestDTO> receiveInterestByAccountId(@PathVariable Long accountId) {
+
+        LocalDate today = LocalDate.now();
+
+        boolean todayInterest = interestHistoryService.getExistsTodayInterest(accountId,today);
+
+        if (todayInterest) {
+        // 이미 오늘 수령한 경우
+            return  ResultDTO.res(HttpStatus.BAD_REQUEST,"오늘은 이미 수령하셨습니다");
+
+        }
+
+        LocalDate gotInterestDate = interestHistoryService.getLastInterestDate(accountId);
+
+        int daysBetween = (int) ChronoUnit.DAYS.between(gotInterestDate, today) - 1;
+
+        Optional<Account> foundAccount= accountService.getAccountById(accountId);
+
+        Long todayTransactions = interestHistoryService.getBalanceExcludingTodayTransactions(accountId,today);
+
+        if (foundAccount.isPresent()) {
+            long interest = (long) (daysBetween
+                    * foundAccount.get().getInterestRate()
+                    * (foundAccount.get().getBalance() - todayTransactions))/365;
+
+            interestHistoryService.saveInterest(foundAccount.get(), interest, today);
+
+            transactionHistoryService.receiveInterest(foundAccount.get(),interest,today, "183-917375-18402");
+
+            // 새 계좌 잔액
+            Long newBalance = foundAccount.get().getBalance() + interest;
+
+            foundAccount.get().increaseBalance(interest);
+            accountService.save(foundAccount.get());
+
+            ReceiveInterestDTO receiveInterestDTO = ReceiveInterestDTO.builder().accountId(accountId).interestAmount(interest).newBalance(newBalance).receivedDate(today).build();
+            return ResultDTO.res(HttpStatus.ACCEPTED,"이자 받기 성공",receiveInterestDTO);
+        }
+        return ResultDTO.res(HttpStatus.BAD_REQUEST,"이자 조회 실패");
+
+    }
 }
