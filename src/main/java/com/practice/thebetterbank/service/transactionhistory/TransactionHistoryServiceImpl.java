@@ -31,7 +31,7 @@ public class TransactionHistoryServiceImpl implements TransactionHistoryService 
     public void receiveInterest(Account account, long interest, LocalDate today, String targetAccountNumber) {
         TransactionHistory transactionHistory = TransactionHistory.builder()
                 .transactionDate(today)
-                .transactionName("조은은행 이자")
+                .transactionName("통장 이자")
                 .amount(interest)
                 .targetAccountNumber(targetAccountNumber)
                 .transactionType(TransactionType.DEPOSIT)
