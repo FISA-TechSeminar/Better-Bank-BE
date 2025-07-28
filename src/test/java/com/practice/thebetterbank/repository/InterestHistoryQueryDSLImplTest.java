@@ -82,13 +82,13 @@ class InterestHistoryQueryDSLImplTest {
         when(balanceQuery.where(account.id.eq(1L))).thenReturn(balanceQuery);
         when(balanceQuery.fetchOne()).thenReturn(1000L); // 현재 잔액
 
-        Long result = interestHistoryQueryDSL.findBalanceExcludingTodayTransactions(1L, today);
+        Long result = interestHistoryQueryDSL.findBalanceTodayTransactions(1L, today);
         assertThat(result).isEqualTo(800L); // 1000 - 200 = 800
 
         // Null 테스트 (null → 0 처리)
         when(transactionQuery.fetchOne()).thenReturn(null);
         when(balanceQuery.fetchOne()).thenReturn(null);
-        result = interestHistoryQueryDSL.findBalanceExcludingTodayTransactions(1L, today);
+        result = interestHistoryQueryDSL.findBalanceTodayTransactions(1L, today);
         assertThat(result).isEqualTo(0L);
     }
 }

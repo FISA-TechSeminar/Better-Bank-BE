@@ -65,7 +65,7 @@ public class AccountController {
         Long todayTransactions = interestHistoryService.getBalanceExcludingTodayTransactions(accountId,today);
         if (foundAccount.isPresent()) {
             double interest = daysBetween
-                                *foundAccount.get().getInterestRate()
+                                *foundAccount.get().getInterestRate() / 100
                                 *(foundAccount.get().getBalance()-todayTransactions);
 
             InterestDTO interestDTO = InterestDTO.builder().accountId(accountId).lastInterestDate(gotInterestDate).interestAmount((long) interest).build();
@@ -92,7 +92,7 @@ public class AccountController {
 
         LocalDate gotInterestDate = interestHistoryService.getLastInterestDate(accountId);
 
-        int daysBetween = (int) ChronoUnit.DAYS.between(gotInterestDate, today) - 1;
+        int daysBetween = (int) ChronoUnit.DAYS.between(gotInterestDate, today);
 
         Optional<Account> foundAccount= accountService.getAccountById(accountId);
 
@@ -100,7 +100,7 @@ public class AccountController {
 
         if (foundAccount.isPresent()) {
             long interest = (long) (daysBetween
-                    * foundAccount.get().getInterestRate()
+                    * foundAccount.get().getInterestRate() /100
                     * (foundAccount.get().getBalance() - todayTransactions))/365;
 
             interestHistoryService.saveInterest(foundAccount.get(), interest, today);
