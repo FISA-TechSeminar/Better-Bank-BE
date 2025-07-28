@@ -105,7 +105,7 @@ public class AccountController {
 
             interestHistoryService.saveInterest(foundAccount.get(), interest, today);
 
-            transactionHistoryService.receiveInterest(foundAccount.get(),interest,today, "183-917375-18402");
+            transactionHistoryService.receiveInterest(foundAccount.get(),interest, today, "183-917375-18402");
 
             // 새 계좌 잔액
             Long newBalance = foundAccount.get().getBalance() + interest;
