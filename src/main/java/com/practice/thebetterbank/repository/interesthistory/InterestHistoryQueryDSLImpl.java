@@ -41,9 +41,8 @@ public class InterestHistoryQueryDSLImpl implements InterestHistoryQueryDSL {
     }
 
     @Override
-    public Long findBalanceExcludingTodayTransactions(Long accountId, LocalDate today) {
+    public Long findBalanceTodayTransactions(Long accountId, LocalDate today) {
         QTransactionHistory th = QTransactionHistory.transactionHistory;
-        QAccount account = QAccount.account;
 
         // 오늘 발생한 거래 총합
         Long todayTransactionSum = queryFactory
@@ -55,17 +54,8 @@ public class InterestHistoryQueryDSLImpl implements InterestHistoryQueryDSL {
                 )
                 .fetchOne();
 
-        // 계좌 원금 (잔액) 조회
-        Long currentBalance = queryFactory
-                .select(account.balance)
-                .from(account)
-                .where(account.id.eq(accountId))
-                .fetchOne();
-
-        // 둘 중 하나라도 null이면 0으로 처리
-        if (currentBalance == null) currentBalance = 0L;
         if (todayTransactionSum == null) todayTransactionSum = 0L;
 
-        return currentBalance - todayTransactionSum;
+        return todayTransactionSum;
     }
 }
