@@ -100,7 +100,7 @@ public class AccountController {
 
         if (foundAccount.isPresent()) {
             long interest = (long) (daysBetween
-                    * foundAccount.get().getInterestRate()
+                    * foundAccount.get().getInterestRate() / 100
                     * (foundAccount.get().getBalance() - todayTransactions))/365;
 
             interestHistoryService.saveInterest(foundAccount.get(), interest, today);
