@@ -11,5 +11,5 @@ public interface InterestHistoryQueryDSL {
     LocalDate findLastInterestDate(Long accountId);
 
     // 가장 최근의 원금 (이자 계산용)
-    Long findBalanceExcludingTodayTransactions(Long accountId, LocalDate today);
+    Long findBalanceTodayTransactions(Long accountId, LocalDate today);
 }

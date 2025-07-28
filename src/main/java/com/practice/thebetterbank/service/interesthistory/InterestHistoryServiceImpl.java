@@ -26,7 +26,7 @@ public class InterestHistoryServiceImpl implements InterestHistoryService {
 
     @Override
     public Long getBalanceExcludingTodayTransactions(Long accountId, LocalDate today){
-        return interestHistoryRepository.findBalanceExcludingTodayTransactions(accountId, today);
+        return interestHistoryRepository.findBalanceTodayTransactions(accountId, today);
     }
 
     @Override
