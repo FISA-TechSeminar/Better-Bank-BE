@@ -3,7 +3,7 @@ server:
 
 spring:
   application:
-    name=thebetterbank
+    name: thebetterbank
   datasource:
     url: jdbc:oracle:thin:@localhost:1521:XE
     username: scott
@@ -16,7 +16,7 @@ spring:
     allow-bean-definition-overriding: true
 
   jackson:
-    time-zone: Asia/Seoul # Jackson? ???? ?? ??? ??
+    time-zone: Asia/Seoul
 
   jpa:
     hibernate:
