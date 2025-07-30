@@ -31,53 +31,68 @@ public class InterestHistoryServiceImpl implements InterestHistoryService {
 
     public InterestDTO receiveInterest(Long accountId) {
         LocalDate today = LocalDate.now();
+        String lockKey = "interest:lock:" + accountId;
 
-        // 1. 오늘 이자 수령 여부 확인
-        if (getExistsTodayInterest(accountId, today)) {
-            return null; // 이미 수령한 경우 null 또는 예외 처리
+        // 1. 분산락 획득 시도 (5초 TTL)
+        Boolean lockAcquired = redisTemplate.opsForValue()
+                .setIfAbsent(lockKey, "LOCK", 5, TimeUnit.SECONDS);
+
+        if (lockAcquired == null || !lockAcquired) {
+            // 락 획득 실패 시: 동시에 처리 중이므로 중복 방지
+            return null;
         }
 
-        // 2. 계좌 조회
-        Optional<Account> foundAccount = accountService.getAccountById(accountId);
-        if (foundAccount.isEmpty()) return null;
+        try {
+            // 2. 오늘 이자 수령 여부 확인
+            if (getExistsTodayInterest(accountId, today)) {
+                return null;
+            }
 
-        Account account = foundAccount.get();
+            // 3. 계좌 조회
+            Optional<Account> foundAccount = accountService.getAccountById(accountId);
+            if (foundAccount.isEmpty()) return null;
 
-        // 3. 이자 계산
-        LocalDate gotInterestDate = getLastInterestDate(accountId);
-        int daysBetween = (int) ChronoUnit.DAYS.between(gotInterestDate, today);
-        Long todayTransactions = getBalanceExcludingTodayTransactions(accountId, today);
+            Account account = foundAccount.get();
 
-        double interest = daysBetween
-                * account.getInterestRate() / 100
-                * (account.getBalance() - todayTransactions);
+            // 4. 이자 계산
+            LocalDate gotInterestDate = getLastInterestDate(accountId);
+            int daysBetween = (int) ChronoUnit.DAYS.between(gotInterestDate, today);
+            Long todayTransactions = getBalanceExcludingTodayTransactions(accountId, today);
 
-        // 4. DB 저장 + 캐시 갱신
-        saveInterest(account, interest, today);
+            double interest = daysBetween
+                    * account.getInterestRate() / 100
+                    * (account.getBalance() - todayTransactions);
 
-        // Redis 캐시를 0원으로 갱신
-        InterestDTO zeroInterest = InterestDTO.builder()
-                .accountId(accountId)
-                .lastInterestDate(today)
-                .interestAmount(0L)
-                .build();
+            // 5. DB 저장 + 캐시 갱신
+            saveInterest(account, interest, today);
 
-        redisTemplate.opsForValue().set(
-                "interest:calc:" + accountId,
-                zeroInterest,
-                getSecondsUntilMidnight(), // 오늘 밤까지 유효
-                TimeUnit.SECONDS
-        );
+            // Redis 캐시를 0원으로 갱신
+            InterestDTO zeroInterest = InterestDTO.builder()
+                    .accountId(accountId)
+                    .lastInterestDate(today)
+                    .interestAmount(0L)
+                    .build();
 
-        // 5. 응답 DTO 반환
-        return InterestDTO.builder()
-                .accountId(accountId)
-                .lastInterestDate(today)
-                .interestAmount((long) interest)
-                .build();
+            redisTemplate.opsForValue().set(
+                    "interest:calc:" + accountId,
+                    zeroInterest,
+                    getSecondsUntilMidnight(), // 오늘 밤까지 유효
+                    TimeUnit.SECONDS
+            );
 
+            // 6. 응답 DTO 반환
+            return InterestDTO.builder()
+                    .accountId(accountId)
+                    .lastInterestDate(today)
+                    .interestAmount((long) interest)
+                    .build();
 
+        } finally {
+            // 7. 락 해제
+            redisTemplate.delete(lockKey);
+        }
     }
+
 
 
     @Override
