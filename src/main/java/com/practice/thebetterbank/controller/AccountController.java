@@ -53,28 +53,15 @@ public class AccountController {
 
     @GetMapping("/accounts/{accountId}/interest")
     public ResultDTO<InterestDTO> selectInterestByAccountId(@PathVariable Long accountId) {
-        LocalDate today = LocalDate.now();
-        boolean todayInterest = interestHistoryService.getExistsTodayInterest(accountId,today);
+        InterestDTO interestDTO = interestHistoryService.getCachedInterest(accountId);
 
-        if (todayInterest) {
-            return  ResultDTO.res(HttpStatus.BAD_REQUEST,"오늘은 이미 수령하셨습니다");
+        if (interestDTO == null) {
+            return ResultDTO.res(HttpStatus.BAD_REQUEST, "오늘은 이미 수령하셨습니다");
         }
-        LocalDate gotInterestDate = interestHistoryService.getLastInterestDate(accountId);
-        int daysBetween = (int) ChronoUnit.DAYS.between(gotInterestDate, today);
-        Optional<Account> foundAccount= accountService.getAccountById(accountId);
-        Long todayTransactions = interestHistoryService.getBalanceExcludingTodayTransactions(accountId,today);
-        if (foundAccount.isPresent()) {
-            double interest = daysBetween
-                                *foundAccount.get().getInterestRate() / 100
-                                *(foundAccount.get().getBalance()-todayTransactions);
 
-            InterestDTO interestDTO = InterestDTO.builder().accountId(accountId).lastInterestDate(gotInterestDate).interestAmount((long) interest).build();
-            return ResultDTO.res(HttpStatus.ACCEPTED,"이자 조회 성공",interestDTO);
-        }
-        return ResultDTO.res(HttpStatus.BAD_REQUEST,"이자 조회 실패");
-
-
+        return ResultDTO.res(HttpStatus.ACCEPTED, "이자 조회 성공", interestDTO);
     }
+
 
 
     @GetMapping("/accounts/{accountId}/receiveinterest")
@@ -104,6 +91,7 @@ public class AccountController {
                     * (foundAccount.get().getBalance() - todayTransactions))/365;
 
             interestHistoryService.saveInterest(foundAccount.get(), interest, today);
+            interestHistoryService.evictCachedInterest(accountId);
 
             transactionHistoryService.receiveInterest(foundAccount.get(),interest, today, "183-917375-18402");
 

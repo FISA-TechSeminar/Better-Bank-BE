@@ -20,7 +20,7 @@ public class MemberController {
     private final MemberService memberService;
 
     @GetMapping("/{id}")
-    public ResultDTO<MemberDTO> getUser(@PathVariable Long id, HttpSession session) {
+    public ResultDTO<MemberDTO> getUser(@PathVariable("id") Long id, HttpSession session) {
 
         Member user = memberService.getUserById(id) // 존재하지 않을시 Exception
             .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다: " + id));
