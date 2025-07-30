@@ -9,9 +9,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -47,7 +50,6 @@ public class InterestHistoryServiceImpl implements InterestHistoryService {
                 .ihAmount(interest)
                 .build());
     }
-
     public InterestDTO getCachedInterest(Long accountId) {
         String key = INTEREST_CACHE_PREFIX + accountId;
 
@@ -75,14 +77,22 @@ public class InterestHistoryServiceImpl implements InterestHistoryService {
                     .interestAmount((long) interest)
                     .build();
 
-            // 3. Redis에 저장 (Write-Through)
-            redisTemplate.opsForValue().set(key, interestDTO);
+//            // 3. Redis에 저장 (오늘 자정까지 TTL)
+            redisTemplate.opsForValue().set(key, interestDTO, getSecondsUntilMidnight(), TimeUnit.SECONDS);
+
 
             return interestDTO;
         }
 
         return null;
     }
+
+    private long getSecondsUntilMidnight() {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime midnight = now.toLocalDate().plusDays(1).atStartOfDay();
+        return Duration.between(now, midnight).getSeconds();
+    }
+
 
     public void evictCachedInterest(Long accountId) {
         redisTemplate.delete(INTEREST_CACHE_PREFIX + accountId);
