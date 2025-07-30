@@ -1,11 +1,13 @@
 package com.practice.thebetterbank.service.interesthistory;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.practice.thebetterbank.controller.dto.InterestDTO;
 import com.practice.thebetterbank.entity.Account;
 import com.practice.thebetterbank.entity.InterestHistory;
 import com.practice.thebetterbank.repository.interesthistory.InterestHistoryRepository;
 import com.practice.thebetterbank.service.account.AccountService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +29,57 @@ public class InterestHistoryServiceImpl implements InterestHistoryService {
     private final RedisTemplate<String, Object> redisTemplate;
     private final AccountService accountService;
 
+    public InterestDTO receiveInterest(Long accountId) {
+        LocalDate today = LocalDate.now();
+
+        // 1. 오늘 이자 수령 여부 확인
+        if (getExistsTodayInterest(accountId, today)) {
+            return null; // 이미 수령한 경우 null 또는 예외 처리
+        }
+
+        // 2. 계좌 조회
+        Optional<Account> foundAccount = accountService.getAccountById(accountId);
+        if (foundAccount.isEmpty()) return null;
+
+        Account account = foundAccount.get();
+
+        // 3. 이자 계산
+        LocalDate gotInterestDate = getLastInterestDate(accountId);
+        int daysBetween = (int) ChronoUnit.DAYS.between(gotInterestDate, today);
+        Long todayTransactions = getBalanceExcludingTodayTransactions(accountId, today);
+
+        double interest = daysBetween
+                * account.getInterestRate() / 100
+                * (account.getBalance() - todayTransactions);
+
+        // 4. DB 저장 + 캐시 갱신
+        saveInterest(account, interest, today);
+
+        // Redis 캐시를 0원으로 갱신
+        InterestDTO zeroInterest = InterestDTO.builder()
+                .accountId(accountId)
+                .lastInterestDate(today)
+                .interestAmount(0L)
+                .build();
+
+        redisTemplate.opsForValue().set(
+                "interest:calc:" + accountId,
+                zeroInterest,
+                getSecondsUntilMidnight(), // 오늘 밤까지 유효
+                TimeUnit.SECONDS
+        );
+
+        // 5. 응답 DTO 반환
+        return InterestDTO.builder()
+                .accountId(accountId)
+                .lastInterestDate(today)
+                .interestAmount((long) interest)
+                .build();
+
+
+    }
+
+
     @Override
     public Boolean getExistsTodayInterest(Long accountId, LocalDate today) {
         return interestHistoryRepository.existsTodayInterest(accountId, today);
@@ -42,20 +95,47 @@ public class InterestHistoryServiceImpl implements InterestHistoryService {
         return interestHistoryRepository.findBalanceTodayTransactions(accountId, today);
     }
 
+//    @Override
+//    public void saveInterest(Account account, double interest, LocalDate today) {
+//        interestHistoryRepository.save(InterestHistory.builder()
+//                .account(account)
+//                .ihDate(today)
+//                .ihAmount(interest)
+//                .build());
+//    }
+
     @Override
     public void saveInterest(Account account, double interest, LocalDate today) {
+        // 1. DB 저장
         interestHistoryRepository.save(InterestHistory.builder()
                 .account(account)
                 .ihDate(today)
                 .ihAmount(interest)
                 .build());
+
+        // 2. Redis 캐시 업데이트
+        InterestDTO updatedDto = InterestDTO.builder()
+                .accountId(account.getId())
+                .lastInterestDate(today)
+                .interestAmount((long) interest)
+                .build();
+
+        String key = "interest:calc:" + account.getId();
+        redisTemplate.opsForValue().set(key, updatedDto, getSecondsUntilMidnight(), TimeUnit.SECONDS);
     }
+
+    @Autowired
+    private ObjectMapper objectMapper;
     public InterestDTO getCachedInterest(Long accountId) {
         String key = INTEREST_CACHE_PREFIX + accountId;
 
         // 1. Redis 조회
-        InterestDTO cached = (InterestDTO) redisTemplate.opsForValue().get(key);
-        if (cached != null) return cached;
+        Object cachedObject = redisTemplate.opsForValue().get(key);
+        if (cachedObject != null) {
+            // 안전하게 LinkedHashMap -> DTO 변환
+            InterestDTO cached = objectMapper.convertValue(cachedObject, InterestDTO.class);
+            return cached;
+        }
 
         // 2. 캐시에 없으면 계산
         LocalDate today = LocalDate.now();
