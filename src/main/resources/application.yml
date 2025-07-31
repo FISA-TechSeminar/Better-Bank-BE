@@ -1,5 +1,8 @@
 server:
   port: 8080
+  tomcat:
+    mbeanregistry:
+      enabled: true
 
 spring:
   application:
@@ -38,3 +41,20 @@ spring:
       port: 6379
       password: 1234
       timeout: 10000
+
+# actuator
+management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus
+
+  endpoint:
+    health:
+      show-details: always
+
+  info:
+    os:
+      enabled: true
+    java:
+      enabled: true
