@@ -66,45 +66,30 @@ public class AccountController {
 
     @GetMapping("/accounts/{accountId}/receiveinterest")
     public ResultDTO<ReceiveInterestDTO> receiveInterestByAccountId(@PathVariable("accountId") Long accountId) {
+        InterestDTO dto = interestHistoryService.receiveInterest(accountId);
 
-        LocalDate today = LocalDate.now();
-
-        boolean todayInterest = interestHistoryService.getExistsTodayInterest(accountId,today);
-
-        if (todayInterest) {
-        // 이미 오늘 수령한 경우
-            return  ResultDTO.res(HttpStatus.BAD_REQUEST,"오늘은 이미 수령하셨습니다");
-
+        if (dto == null || dto.getInterestAmount() == 0L) {
+            return ResultDTO.res(HttpStatus.BAD_REQUEST, "오늘은 이미 수령하셨습니다");
         }
 
-        LocalDate gotInterestDate = interestHistoryService.getLastInterestDate(accountId);
+        // 계좌 잔액 증가
+        Optional<Account> foundAccount = accountService.getAccountById(accountId);
+        if (foundAccount.isEmpty()) return ResultDTO.res(HttpStatus.NOT_FOUND, "계좌를 찾을 수 없습니다");
+        Account account = foundAccount.get();
+        account.increaseBalance(dto.getInterestAmount());
+        accountService.save(account);
 
-        int daysBetween = (int) ChronoUnit.DAYS.between(gotInterestDate, today);
+        // 거래내역 저장
+        transactionHistoryService.receiveInterest(account, dto.getInterestAmount(), dto.getLastInterestDate(), "183-917375-18402");
 
-        Optional<Account> foundAccount= accountService.getAccountById(accountId);
+        // 응답 DTO 생성
+        ReceiveInterestDTO result = ReceiveInterestDTO.builder()
+                .accountId(accountId)
+                .interestAmount(dto.getInterestAmount())
+                .newBalance(account.getBalance())
+                .receivedDate(dto.getLastInterestDate())
+                .build();
 
-        Long todayTransactions = interestHistoryService.getBalanceExcludingTodayTransactions(accountId,today);
-
-        if (foundAccount.isPresent()) {
-            long interest = (long) (daysBetween
-                    * foundAccount.get().getInterestRate() / 100
-                    * (foundAccount.get().getBalance() - todayTransactions))/365;
-
-            interestHistoryService.saveInterest(foundAccount.get(), interest, today);
-            interestHistoryService.evictCachedInterest(accountId);
-
-            transactionHistoryService.receiveInterest(foundAccount.get(),interest, today, "183-917375-18402");
-
-            // 새 계좌 잔액
-            Long newBalance = foundAccount.get().getBalance() + interest;
-
-            foundAccount.get().increaseBalance(interest);
-            accountService.save(foundAccount.get());
-
-            ReceiveInterestDTO receiveInterestDTO = ReceiveInterestDTO.builder().accountId(accountId).interestAmount(interest).newBalance(newBalance).receivedDate(today).build();
-            return ResultDTO.res(HttpStatus.ACCEPTED,"이자 받기 성공",receiveInterestDTO);
-        }
-        return ResultDTO.res(HttpStatus.BAD_REQUEST,"이자 조회 실패");
-
+        return ResultDTO.res(HttpStatus.ACCEPTED, "이자 받기 성공", result);
     }
 }

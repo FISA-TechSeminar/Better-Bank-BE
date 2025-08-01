@@ -31,6 +31,7 @@ public class InterestHistoryServiceImpl implements InterestHistoryService {
 
     public InterestDTO receiveInterest(Long accountId) {
         LocalDate today = LocalDate.now();
+        String cacheKey = INTEREST_CACHE_PREFIX + accountId;
         String lockKey = "interest:lock:" + accountId;
 
         // 1. 분산락 획득 시도 (5초 TTL)
@@ -63,10 +64,10 @@ public class InterestHistoryServiceImpl implements InterestHistoryService {
                     * account.getInterestRate() / 100
                     * (account.getBalance() - todayTransactions);
 
-            // 5. DB 저장 + 캐시 갱신
+            // 5. DB 저장
             saveInterest(account, interest, today);
 
-            // Redis 캐시를 0원으로 갱신
+            // 6. 캐시를 0원으로 갱신 (이자 수령 완료 표시)
             InterestDTO zeroInterest = InterestDTO.builder()
                     .accountId(accountId)
                     .lastInterestDate(today)
@@ -74,13 +75,16 @@ public class InterestHistoryServiceImpl implements InterestHistoryService {
                     .build();
 
             redisTemplate.opsForValue().set(
-                    "interest:calc:" + accountId,
+                    cacheKey,
                     zeroInterest,
-                    getSecondsUntilMidnight(), // 오늘 밤까지 유효
+                    getSecondsUntilMidnight(),
                     TimeUnit.SECONDS
             );
 
-            // 6. 응답 DTO 반환
+            System.out.println(">>> Redis 캐시 0원으로 갱신 완료. 현재 캐시값: "
+                    + redisTemplate.opsForValue().get(cacheKey));
+
+            // 7. 응답 DTO 반환 (실제 수령한 이자 금액)
             return InterestDTO.builder()
                     .accountId(accountId)
                     .lastInterestDate(today)
@@ -88,7 +92,8 @@ public class InterestHistoryServiceImpl implements InterestHistoryService {
                     .build();
 
         } finally {
-            // 7. 락 해제
+            // 8. 락 해제만 수행
+            System.out.println(">>> Releasing lock, will DEL key: " + lockKey);
             redisTemplate.delete(lockKey);
         }
     }
@@ -121,22 +126,24 @@ public class InterestHistoryServiceImpl implements InterestHistoryService {
 
     @Override
     public void saveInterest(Account account, double interest, LocalDate today) {
-        // 1. DB 저장
+        // DB 저장은 유지
         interestHistoryRepository.save(InterestHistory.builder()
                 .account(account)
                 .ihDate(today)
                 .ihAmount(interest)
                 .build());
 
-        // 2. Redis 캐시 업데이트
-        InterestDTO updatedDto = InterestDTO.builder()
-                .accountId(account.getId())
-                .lastInterestDate(today)
-                .interestAmount((long) interest)
-                .build();
-
-        String key = "interest:calc:" + account.getId();
-        redisTemplate.opsForValue().set(key, updatedDto, getSecondsUntilMidnight(), TimeUnit.SECONDS);
+//        // Redis 캐시는 interest == 0일 때만 저장
+//        if ((long) interest == 0L) {
+//            InterestDTO zeroInterest = InterestDTO.builder()
+//                    .accountId(account.getId())
+//                    .lastInterestDate(today)
+//                    .interestAmount(0L)
+//                    .build();
+//
+//            String key = INTEREST_CACHE_PREFIX + account.getId();
+//            redisTemplate.opsForValue().set(key, zeroInterest, getSecondsUntilMidnight(), TimeUnit.SECONDS);
+//        }
     }
 
     @Autowired
