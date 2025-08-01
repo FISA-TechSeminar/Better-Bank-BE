@@ -15,3 +15,5 @@ public class ReceiveInterestDTO {
     private Long newBalance;
     private LocalDate receivedDate;
 }
+
+

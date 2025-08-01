@@ -25,7 +25,7 @@ public class TransactionHistoryController {
 
     @GetMapping("/{accountId}")
     public ResultDTO<TransactionHistoryListDTO> getTransactionHistoryByAccountId(
-            @PathVariable Long accountId,
+            @PathVariable("accountId") Long accountId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {

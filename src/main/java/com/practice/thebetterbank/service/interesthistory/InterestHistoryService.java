@@ -1,9 +1,9 @@
 package com.practice.thebetterbank.service.interesthistory;
 
 import com.practice.thebetterbank.controller.dto.InterestDTO;
+import java.time.LocalDate;
 import com.practice.thebetterbank.entity.Account;
 
-import java.time.LocalDate;
 
 public interface InterestHistoryService {
 
@@ -17,4 +17,6 @@ public interface InterestHistoryService {
     InterestDTO getCachedInterest(Long accountId);
 
     void evictCachedInterest(Long accountId);
+
+    InterestDTO receiveInterest(Long accountId);
 }
