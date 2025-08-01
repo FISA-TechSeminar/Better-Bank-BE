@@ -47,6 +47,8 @@ dependencies {
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
 
     // QueryDSL
     implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
@@ -61,6 +63,10 @@ dependencies {
     // jackson-datatype-jsr310
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 
+}
+
+compileJava {
+    options.compilerArgs << "-parameters" // 👈 이거 꼭 있어야 함!
 }
 
 tasks.named('test') {

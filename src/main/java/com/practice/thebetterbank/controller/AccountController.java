@@ -34,7 +34,7 @@ public class AccountController {
 
     // 유저별 계좌 목록 조회
     @GetMapping("/members/{memberId}/accounts")
-    public ResultDTO<List<AccountDTO>> getAccountsByMemberId(@PathVariable Long memberId) {
+    public ResultDTO<List<AccountDTO>> getAccountsByMemberId(@PathVariable("memberId") Long memberId) {
         List<AccountDTO> accounts = accountService.getAccountsByMemberId(memberId)
                         .stream().map(AccountDTO::toDTO)
                         .toList();
@@ -44,7 +44,7 @@ public class AccountController {
 
     // 계좌 상세 조회
     @GetMapping("/accounts/{accountId}")
-    public ResultDTO<Account> getAccountById(@PathVariable Long accountId) {
+    public ResultDTO<Account> getAccountById(@PathVariable("accountId") Long accountId) {
 
         return accountService.getAccountById(accountId)
                 .map(account -> ResultDTO.res(HttpStatus.OK, "계좌 상세 조회 성공", account))
@@ -52,7 +52,7 @@ public class AccountController {
     }
 
     @GetMapping("/accounts/{accountId}/interest")
-    public ResultDTO<InterestDTO> selectInterestByAccountId(@PathVariable Long accountId) {
+    public ResultDTO<InterestDTO> selectInterestByAccountId(@PathVariable("accountId") Long accountId) {
         InterestDTO interestDTO = interestHistoryService.getCachedInterest(accountId);
 
         if (interestDTO == null) {
@@ -65,7 +65,7 @@ public class AccountController {
 
 
     @GetMapping("/accounts/{accountId}/receiveinterest")
-    public ResultDTO<ReceiveInterestDTO> receiveInterestByAccountId(@PathVariable Long accountId) {
+    public ResultDTO<ReceiveInterestDTO> receiveInterestByAccountId(@PathVariable("accountId") Long accountId) {
 
         LocalDate today = LocalDate.now();
 
