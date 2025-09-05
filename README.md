@@ -21,7 +21,7 @@
 ## 기술 스택 🛠
 - **Spring Boot 3.5.3** (메인 프레임워크)
 - **Spring Data JPA** + **QueryDSL** (데이터 액세스)  
-- **MySQL** (운영 DB) / **H2** (테스트 DB)  
+- **ORACLE** (운영 DB) / **H2** (테스트 DB)  
 - **Gradle** (빌드 도구)  
 - **Java 17** (개발 언어)  
 
